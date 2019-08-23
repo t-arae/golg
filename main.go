@@ -60,7 +60,7 @@ func main() {
 			new_cm = next_map(RN, CN, pre_cm)
 
 			if reflect.DeepEqual(new_cm, last_cm) {
-				temp_list = temp_list + fmt.Sprintf("game %d: %d cycle\n", game_count, cycle_count)
+				temp_list = temp_list + fmt.Sprintf("game %d (seed %d): %d cycle\n", game_count, cms.seed, cycle_count)
 				text_list.SetText(temp_list)
 				game_count++
 				cms = NewCellmaps(RN, CN, NMAPS)
@@ -103,15 +103,18 @@ type Cellmaps struct {
 	rn    int
 	cn    int
 	n     int
+	seed  int64
 	cells []int
 }
 
 func NewCellmaps(rn, cn, n int) *Cellmaps {
-	cms := &Cellmaps{rn: rn, cn: cn, n: n}
+	s := time.Now().Unix()
+	cms := &Cellmaps{rn: rn, cn: cn, n: n, seed: s}
 	cms.Initialize()
 	return cms
 }
 func (self *Cellmaps) Initialize() {
+	rand.Seed(self.seed)
 	self.cells = make([]int, self.cn*self.rn*self.n)
 	for i := 0; i < self.cn*self.rn; i++ {
 		self.cells[i] = rand.Intn(2)
