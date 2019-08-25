@@ -37,50 +37,40 @@ func main() {
 		app.Draw()
 	})
 
-	text_list := tview.NewTextView().SetScrollable(true).
+	hist_list := tview.NewTextView().SetScrollable(true).
 		SetChangedFunc(func() {
 			app.Draw()
 		})
 
 	cms := NewCellmaps(RN, CN, NMAPS)
+	game_count := 1
+	cycle_count := 0
+	hist := ""
 
 	go func() {
-		game_count := 1
-		cycle_count := 0
-		temp_list := ""
+		//game_count := 1
+		//cycle_count := 0
+		//hist := ""
 		pre_cm := make([]int, RCN)
 		last_cm := make([]int, RCN)
 		new_cm := make([]int, RCN)
 		for {
 			cycle_count++
-			temp := ""
-
 			pre_cm = cms.cells[0:RCN]
 			last_cm = cms.cells[RCN:]
 			new_cm = next_map(RN, CN, pre_cm)
 
 			if reflect.DeepEqual(new_cm, last_cm) {
-				temp_list = temp_list + fmt.Sprintf("game %d (seed %d): %d cycle\n", game_count, cms.seed, cycle_count)
-				text_list.SetText(temp_list)
+				hist = hist + fmt.Sprintf("game %d (seed %d): %d cycle\n", game_count, cms.seed, cycle_count)
+				hist_list.SetText(hist)
 				game_count++
 				cms = NewCellmaps(RN, CN, NMAPS)
 				cycle_count = 0
 				//break
 			} else {
-				for rn := 0; rn < RN; rn++ {
-					for cn := 0; cn < CN; cn++ {
-						if new_cm[rn*CN+cn] == 0 {
-							temp = temp + D
-						} else {
-							temp = temp + L
-						}
-					}
-					temp = temp + "\n"
-				}
-
 				cms.cells = append(new_cm, cms.cells[0:RCN]...)
-
-				text_map.SetText(temp).SetTextAlign(tview.AlignCenter)
+				text_map.SetText(map2string(new_cm, RN, CN)).
+					SetTextAlign(tview.AlignCenter)
 				text_cycle.SetText(fmt.Sprintf("cycle: %d", cycle_count)).
 					SetTextAlign(tview.AlignCenter)
 				time.Sleep(DELAY)
@@ -88,13 +78,27 @@ func main() {
 		}
 	}()
 
+	menu_list := tview.NewList().
+		AddItem("Reset", "press to reset", 'r', func() {
+			hist = hist + fmt.Sprintf("game %d (seed %d): %d cycle\n", game_count, cms.seed, cycle_count)
+			hist_list.SetText(hist)
+			game_count++
+			cms = NewCellmaps(RN, CN, NMAPS)
+			cycle_count = 0
+		}).
+		AddItem("Quit", "press to exit", 'q', func() {
+			app.Stop()
+		})
+
 	flex := tview.NewFlex().
 		AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
 			AddItem(text_cycle, 0, 1, true).
 			AddItem(text_map, 0, 9, true), 0, 1, true).
-		AddItem(text_list, 0, 1, true)
+		AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
+			AddItem(hist_list, 0, 8, true).
+			AddItem(menu_list, 0, 2, true), 0, 1, true)
 
-	if err := app.SetRoot(flex, true).Run(); err != nil {
+	if err := app.SetRoot(flex, true).SetFocus(menu_list).Run(); err != nil {
 		panic(err)
 	}
 }
@@ -113,12 +117,28 @@ func NewCellmaps(rn, cn, n int) *Cellmaps {
 	cms.Initialize()
 	return cms
 }
+
 func (self *Cellmaps) Initialize() {
 	rand.Seed(self.seed)
 	self.cells = make([]int, self.cn*self.rn*self.n)
 	for i := 0; i < self.cn*self.rn; i++ {
 		self.cells[i] = rand.Intn(2)
 	}
+}
+
+func map2string(m []int, RN int, CN int) string {
+	s := ""
+	for i := 0; i < RN; i++ {
+		for j := 0; j < CN; j++ {
+			if m[i*CN+j] == 0 {
+				s = s + D
+			} else {
+				s = s + L
+			}
+		}
+		s = s + "\n"
+	}
+	return s
 }
 
 func calc_next(me int, others []int) int {
