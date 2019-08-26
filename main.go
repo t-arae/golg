@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/rivo/tview"
-	"math/rand"
+	"github.com/t-arae/golg/cellmaps"
 	"reflect"
 	"time"
 )
@@ -42,7 +42,7 @@ func main() {
 			app.Draw()
 		})
 
-	cms := NewCellmaps(RN, CN, NMAPS)
+	cms := cellmaps.NewCellmaps(RN, CN, NMAPS)
 	game_count := 1
 	cycle_count := 0
 	hist := ""
@@ -56,19 +56,19 @@ func main() {
 		new_cm := make([]int, RCN)
 		for {
 			cycle_count++
-			pre_cm = cms.cells[0:RCN]
-			last_cm = cms.cells[RCN:]
+			pre_cm = cms.Cells[0:RCN]
+			last_cm = cms.Cells[RCN:]
 			new_cm = next_map(RN, CN, pre_cm)
 
 			if reflect.DeepEqual(new_cm, last_cm) {
-				hist = hist + fmt.Sprintf("game %d (seed %d): %d cycle\n", game_count, cms.seed, cycle_count)
+				hist = hist + fmt.Sprintf("game %d (seed %d): %d cycle\n", game_count, cms.Seed, cycle_count)
 				hist_list.SetText(hist)
 				game_count++
-				cms = NewCellmaps(RN, CN, NMAPS)
+				cms = cellmaps.NewCellmaps(RN, CN, NMAPS)
 				cycle_count = 0
 				//break
 			} else {
-				cms.cells = append(new_cm, cms.cells[0:RCN]...)
+				cms.Cells = append(new_cm, cms.Cells[0:RCN]...)
 				text_map.SetText(map2string(new_cm, RN, CN))
 				text_cycle.SetText(fmt.Sprintf("cycle: %d", cycle_count))
 				time.Sleep(DELAY)
@@ -78,10 +78,10 @@ func main() {
 
 	menu_list := tview.NewList().
 		AddItem("Reset", "press to reset", 'r', func() {
-			hist = hist + fmt.Sprintf("game %d (seed %d): %d cycle\n", game_count, cms.seed, cycle_count)
+			hist = hist + fmt.Sprintf("game %d (seed %d): %d cycle\n", game_count, cms.Seed, cycle_count)
 			hist_list.SetText(hist)
 			game_count++
-			cms = NewCellmaps(RN, CN, NMAPS)
+			cms = cellmaps.NewCellmaps(RN, CN, NMAPS)
 			cycle_count = 0
 		}).
 		AddItem("Quit", "press to exit", 'q', func() {
@@ -100,29 +100,6 @@ func main() {
 
 	if err := app.SetRoot(flex, true).SetFocus(menu_list).Run(); err != nil {
 		panic(err)
-	}
-}
-
-type Cellmaps struct {
-	rn    int
-	cn    int
-	n     int
-	seed  int64
-	cells []int
-}
-
-func NewCellmaps(rn, cn, n int) *Cellmaps {
-	s := time.Now().Unix()
-	cms := &Cellmaps{rn: rn, cn: cn, n: n, seed: s}
-	cms.Initialize()
-	return cms
-}
-
-func (self *Cellmaps) Initialize() {
-	rand.Seed(self.seed)
-	self.cells = make([]int, self.cn*self.rn*self.n)
-	for i := 0; i < self.cn*self.rn; i++ {
-		self.cells[i] = rand.Intn(2)
 	}
 }
 
