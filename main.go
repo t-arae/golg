@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/rivo/tview"
+	"github.com/t-arae/golg/calcmap"
 	"github.com/t-arae/golg/cellmaps"
 	"reflect"
 	"time"
@@ -58,7 +59,7 @@ func main() {
 			cycle_count++
 			pre_cm = cms.Cells[0:RCN]
 			last_cm = cms.Cells[RCN:]
-			new_cm = next_map(RN, CN, pre_cm)
+			new_cm = calcmap.CalcNextMap(RN, CN, pre_cm)
 
 			if reflect.DeepEqual(new_cm, last_cm) {
 				hist = hist + fmt.Sprintf("game %d (seed %d): %d cycle\n", game_count, cms.Seed, cycle_count)
@@ -116,70 +117,4 @@ func map2string(m []int, RN int, CN int) string {
 		s = s + "\n"
 	}
 	return s
-}
-
-func calc_next(me int, others []int) int {
-	sum := 0
-	for i := 0; i < 8; i++ {
-		sum += others[i]
-	}
-
-	if me == 0 && sum == 3 {
-		return 1
-	}
-	if me == 1 && ((sum == 2) || (sum == 3)) {
-		return 1
-	}
-	return 0
-}
-
-func next_map(row_n int, col_n int, mapA []int) []int {
-	map_len := col_n * row_n
-	mapB := make([]int, map_len)
-	for i := 0; i < row_n; i++ {
-		for j := 0; j < col_n; j++ {
-			var it, ib, jl, jr int
-
-			switch i {
-			case 0:
-				it = row_n - 1
-			default:
-				it = i - 1
-			}
-
-			if i == (row_n - 1) {
-				ib = 0
-			} else {
-				ib = i + 1
-			}
-
-			switch j {
-			case 0:
-				jl = col_n - 1
-			default:
-				jl = j - 1
-			}
-
-			if j == (col_n - 1) {
-				jr = 0
-			} else {
-				jr = j + 1
-			}
-
-			temp_others := [8]int{
-				mapA[it*col_n+jl],
-				mapA[it*col_n+j],
-				mapA[it*col_n+jr],
-
-				mapA[i*col_n+jl],
-				mapA[i*col_n+jr],
-
-				mapA[ib*col_n+jl],
-				mapA[ib*col_n+j],
-				mapA[ib*col_n+jr],
-			}
-			mapB[i*col_n+j] = calc_next(mapA[i*col_n+j], temp_others[:])
-		}
-	}
-	return mapB
 }
