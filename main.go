@@ -69,10 +69,8 @@ func main() {
 				//break
 			} else {
 				cms.cells = append(new_cm, cms.cells[0:RCN]...)
-				text_map.SetText(map2string(new_cm, RN, CN)).
-					SetTextAlign(tview.AlignCenter)
-				text_cycle.SetText(fmt.Sprintf("cycle: %d", cycle_count)).
-					SetTextAlign(tview.AlignCenter)
+				text_map.SetText(map2string(new_cm, RN, CN))
+				text_cycle.SetText(fmt.Sprintf("cycle: %d", cycle_count))
 				time.Sleep(DELAY)
 			}
 		}
@@ -91,12 +89,14 @@ func main() {
 		})
 
 	flex := tview.NewFlex().
-		AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
-			AddItem(text_cycle, 0, 1, true).
-			AddItem(text_map, 0, 9, true), 0, 1, true).
+		AddItem(tview.NewTextView(), 3, 1, false).
 		AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
 			AddItem(hist_list, 0, 8, true).
-			AddItem(menu_list, 0, 2, true), 0, 1, true)
+			AddItem(menu_list, 0, 2, true), 25, 0, false).
+		AddItem(tview.NewTextView(), 3, 1, false).
+		AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
+			AddItem(text_cycle, 0, 1, true).
+			AddItem(text_map, 0, 9, true), 0, 1, false)
 
 	if err := app.SetRoot(flex, true).SetFocus(menu_list).Run(); err != nil {
 		panic(err)
