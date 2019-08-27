@@ -1,6 +1,8 @@
 # golg
 Conway's game of life written in golang
 
+![golg_movie_v1](https://user-images.githubusercontent.com/10335248/63752489-4eb78d80-c8ec-11e9-8233-8a2dc0b49934.gif)
+
 ## Installation
 
 ```bash
