@@ -12,17 +12,31 @@ const L = "\u25a0"
 const D = "  "
 
 func main() {
+	/*
+		res, r, c := ReadText("test.txt")
+		fmt.Println(res)
+		res_b := SetNewBoards(res, r, c, 2)
+		fmt.Println(res_b.Cells)
+	*/
 	var (
-		RN    int
-		CN    int
-		RCN   int
-		NMAPS int
-		DELAY time.Duration
+		RN     int
+		CN     int
+		RCN    int
+		NMAPS  int
+		DELAY  time.Duration
+		INF    string
+		TEXT   []int
+		boards *Boards
 	)
 	flag.IntVar(&RN, "r", 20, "number of rows, int")
 	flag.IntVar(&CN, "c", 20, "number of cols, int")
 	flag.DurationVar(&DELAY, "d", 50*time.Millisecond, "delay time, duration")
+	flag.StringVar(&INF, "in", "", "input file name, string")
 	flag.Parse()
+
+	if INF != "" {
+		TEXT, RN, CN = ReadText(INF)
+	}
 
 	RCN = RN * CN
 	NMAPS = 2
@@ -41,7 +55,11 @@ func main() {
 			app.Draw()
 		})
 
-	boards := NewBoards(RN, CN, NMAPS)
+	if INF != "" {
+		boards = SetNewBoards(TEXT, RN, CN, NMAPS)
+	} else {
+		boards = NewBoards(RN, CN, NMAPS)
+	}
 	game_count := 1
 	cycle_count := 0
 	hist := ""

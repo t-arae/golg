@@ -35,6 +35,18 @@ func (self *Boards) Initialize() {
 	}
 }
 
+func SetNewBoards(b []int, rn, cn, bn int) *Boards {
+	new_b := NewBoards(rn, cn, bn)
+	for i := 0; i < rn*cn*bn; i++ {
+		if i < rn*cn {
+			new_b.Cells[i] = b[i]
+		} else {
+			new_b.Cells[i] = 0
+		}
+	}
+	return new_b
+}
+
 func link(b *Boards) [][]int {
 	IndexAround := make([][]int, b.RCN)
 	for i := 0; i < b.RowN; i++ {
