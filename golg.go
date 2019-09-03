@@ -4,8 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"github.com/rivo/tview"
-	"github.com/t-arae/golg/calcmap"
-	"github.com/t-arae/golg/cellmaps"
 	"reflect"
 	"time"
 )
@@ -43,7 +41,7 @@ func main() {
 			app.Draw()
 		})
 
-	cms := cellmaps.NewCellmaps(RN, CN, NMAPS)
+	cms := NewFields(RN, CN, NMAPS)
 	game_count := 1
 	cycle_count := 0
 	hist := ""
@@ -59,13 +57,13 @@ func main() {
 			cycle_count++
 			pre_cm = cms.Cells[0:RCN]
 			last_cm = cms.Cells[RCN:]
-			new_cm = calcmap.CalcNextMap(RN, CN, pre_cm)
+			new_cm = CalcNextField(RN, CN, pre_cm)
 
 			if reflect.DeepEqual(new_cm, last_cm) {
 				hist = hist + fmt.Sprintf("game %d (seed %d): %d cycle\n", game_count, cms.Seed, cycle_count)
 				hist_list.SetText(hist)
 				game_count++
-				cms = cellmaps.NewCellmaps(RN, CN, NMAPS)
+				cms = NewFields(RN, CN, NMAPS)
 				cycle_count = 0
 				//break
 			} else {
@@ -82,7 +80,7 @@ func main() {
 			hist = hist + fmt.Sprintf("game %d (seed %d): %d cycle\n", game_count, cms.Seed, cycle_count)
 			hist_list.SetText(hist)
 			game_count++
-			cms = cellmaps.NewCellmaps(RN, CN, NMAPS)
+			cms = NewFields(RN, CN, NMAPS)
 			cycle_count = 0
 		}).
 		AddItem("Quit", "press to exit", 'q', func() {

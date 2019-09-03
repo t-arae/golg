@@ -1,4 +1,4 @@
-package calcmap
+package main
 
 func calcNext(me int, others []int) int {
 	sum := 0
@@ -15,7 +15,7 @@ func calcNext(me int, others []int) int {
 	return 0
 }
 
-func CalcNextMap(row_n int, col_n int, mapA []int) []int {
+func CalcNextField(row_n int, col_n int, mapA []int) []int {
 	map_len := col_n * row_n
 	mapB := make([]int, map_len)
 	for i := 0; i < row_n; i++ {
