@@ -41,33 +41,28 @@ func main() {
 			app.Draw()
 		})
 
-	cms := NewFields(RN, CN, NMAPS)
+	boards := NewBoards(RN, CN, NMAPS)
 	game_count := 1
 	cycle_count := 0
 	hist := ""
 
 	go func() {
-		//game_count := 1
-		//cycle_count := 0
-		//hist := ""
-		pre_cm := make([]int, RCN)
 		last_cm := make([]int, RCN)
 		new_cm := make([]int, RCN)
 		for {
 			cycle_count++
-			pre_cm = cms.Cells[0:RCN]
-			last_cm = cms.Cells[RCN:]
-			new_cm = CalcNextField(RN, CN, pre_cm)
+			last_cm = boards.Cells[RCN:]
+			new_cm = CalcNextField(boards)
 
 			if reflect.DeepEqual(new_cm, last_cm) {
-				hist = hist + fmt.Sprintf("game %d (seed %d): %d cycle\n", game_count, cms.Seed, cycle_count)
+				hist = hist + fmt.Sprintf("game %d (seed %d): %d cycle\n", game_count, boards.Seed, cycle_count)
 				hist_list.SetText(hist)
 				game_count++
-				cms = NewFields(RN, CN, NMAPS)
+				boards = NewBoards(RN, CN, NMAPS)
 				cycle_count = 0
 				//break
 			} else {
-				cms.Cells = append(new_cm, cms.Cells[0:RCN]...)
+				boards.Cells = append(new_cm, boards.Cells[0:RCN]...)
 				text_map.SetText(map2string(new_cm, RN, CN))
 				text_cycle.SetText(fmt.Sprintf("cycle: %d", cycle_count))
 				time.Sleep(DELAY)
@@ -77,10 +72,10 @@ func main() {
 
 	menu_list := tview.NewList().
 		AddItem("Reset", "press to reset", 'r', func() {
-			hist = hist + fmt.Sprintf("game %d (seed %d): %d cycle\n", game_count, cms.Seed, cycle_count)
+			hist = hist + fmt.Sprintf("game %d (seed %d): %d cycle\n", game_count, boards.Seed, cycle_count)
 			hist_list.SetText(hist)
 			game_count++
-			cms = NewFields(RN, CN, NMAPS)
+			boards = NewBoards(RN, CN, NMAPS)
 			cycle_count = 0
 		}).
 		AddItem("Quit", "press to exit", 'q', func() {

@@ -5,25 +5,79 @@ import (
 	"time"
 )
 
-type Feilds struct {
-	rn    int
-	cn    int
-	n     int
-	Seed  int64
-	Cells []int
+type Boards struct {
+	RowN   int
+	ColN   int
+	BoardN int
+	Seed   int64
+	// Set by Intialize()
+	RCN         int
+	RCFN        int
+	IndexAround [][]int
+	Cells       []int
 }
 
-func NewFields(rn, cn, n int) *Feilds {
+func NewBoards(rn, cn, n int) *Boards {
 	s := time.Now().Unix()
-	cms := &Feilds{rn: rn, cn: cn, n: n, Seed: s}
-	cms.Initialize()
-	return cms
+	b := &Boards{RowN: rn, ColN: cn, BoardN: n, Seed: s}
+	b.Initialize()
+	return b
 }
 
-func (self *Feilds) Initialize() {
+func (self *Boards) Initialize() {
 	rand.Seed(self.Seed)
-	self.Cells = make([]int, self.cn*self.rn*self.n)
-	for i := 0; i < self.cn*self.rn; i++ {
+	self.RCN = self.RowN * self.ColN
+	self.RCFN = self.RCN * self.BoardN
+	self.IndexAround = link(self)
+	self.Cells = make([]int, self.RCFN)
+	for i := 0; i < self.RCN; i++ {
 		self.Cells[i] = rand.Intn(2)
 	}
+}
+
+func link(b *Boards) [][]int {
+	IndexAround := make([][]int, b.RCN)
+	for i := 0; i < b.RowN; i++ {
+		for j := 0; j < b.ColN; j++ {
+			var it, ib, jl, jr int
+
+			switch i {
+			case 0:
+				it = b.RowN - 1
+			default:
+				it = i - 1
+			}
+
+			if i == (b.RowN - 1) {
+				ib = 0
+			} else {
+				ib = i + 1
+			}
+
+			switch j {
+			case 0:
+				jl = b.ColN - 1
+			default:
+				jl = j - 1
+			}
+
+			if j == (b.ColN - 1) {
+				jr = 0
+			} else {
+				jr = j + 1
+			}
+
+			IndexAround[i*b.ColN+j] = []int{
+				it*b.ColN + jl,
+				it*b.ColN + j,
+				it*b.ColN + jr,
+				i*b.ColN + jl,
+				i*b.ColN + jr,
+				ib*b.ColN + jl,
+				ib*b.ColN + j,
+				ib*b.ColN + jr,
+			}
+		}
+	}
+	return IndexAround
 }
