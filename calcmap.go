@@ -17,13 +17,13 @@ func calcNext(me int, others []int) int {
 
 func CalcNextField(b *Boards) []int {
 	next := make([]int, b.RCN)
-	pre := b.Cells[0:b.RCN]
+	pre := b.Cells[:]
 	for i := 0; i < b.RowN; i++ {
 		for j := 0; j < b.ColN; j++ {
-			temp := i*b.ColN + j
+			temp := i*b.ColN + j + 1
 			temp_index := make([]int, 8)
 			for k := 0; k < 8; k++ {
-				temp_index[k] = pre[b.IndexAround[temp][k]]
+				temp_index[k] = pre[b.IndexAround[temp-1][k]+1]
 			}
 			next[i*b.ColN+j] = calcNext(pre[temp], temp_index)
 		}

@@ -12,12 +12,6 @@ const L = "\u25a0"
 const D = "  "
 
 func main() {
-	/*
-		res, r, c := ReadText("test.txt")
-		fmt.Println(res)
-		res_b := SetNewBoards(res, r, c, 2)
-		fmt.Println(res_b.Cells)
-	*/
 	var (
 		RN     int
 		CN     int
@@ -69,7 +63,7 @@ func main() {
 		new_cm := make([]int, RCN)
 		for {
 			cycle_count++
-			last_cm = boards.Cells[RCN:]
+			last_cm = boards.Cells[(len(boards.Cells) - RCN):]
 			new_cm = CalcNextField(boards)
 
 			if reflect.DeepEqual(new_cm, last_cm) {
@@ -80,7 +74,7 @@ func main() {
 				cycle_count = 0
 				//break
 			} else {
-				boards.Cells = append(new_cm, boards.Cells[0:RCN]...)
+				boards.Cells = append([]int{0}, append(new_cm, boards.Cells[1:RCN+1]...)...)
 				text_map.SetText(map2string(new_cm, RN, CN))
 				text_cycle.SetText(fmt.Sprintf("cycle: %d", cycle_count))
 				time.Sleep(DELAY)

@@ -29,17 +29,17 @@ func (self *Boards) Initialize() {
 	self.RCN = self.RowN * self.ColN
 	self.RCFN = self.RCN * self.BoardN
 	self.IndexAround = link(self)
-	self.Cells = make([]int, self.RCFN)
-	for i := 0; i < self.RCN; i++ {
+	self.Cells = make([]int, self.RCFN+1)
+	for i := 1; i < (self.RCN + 1); i++ {
 		self.Cells[i] = rand.Intn(2)
 	}
 }
 
 func SetNewBoards(b []int, rn, cn, bn int) *Boards {
 	new_b := NewBoards(rn, cn, bn)
-	for i := 0; i < rn*cn*bn; i++ {
-		if i < rn*cn {
-			new_b.Cells[i] = b[i]
+	for i := 1; i < (rn*cn + 1); i++ {
+		if i < (rn*cn + 1) {
+			new_b.Cells[i] = b[i-1]
 		} else {
 			new_b.Cells[i] = 0
 		}
